@@ -24,6 +24,7 @@ const uint8_t video_payload_type = 96;
 WHIPOutput::WHIPOutput(obs_data_t *, obs_output_t *output)
 	: output(output),
 	  is_av1(false),
+	  is_hevc(false),
 	  endpoint_url(),
 	  bearer_token(),
 	  resource_url(),
@@ -61,6 +62,7 @@ bool WHIPOutput::Start()
 	}
 
 	is_av1 = (strcmp("av1", obs_encoder_get_codec(encoder)) == 0);
+	is_hevc = (strcmp("hevc", obs_encoder_get_codec(encoder)) == 0);
 
 	if (!obs_output_can_begin_data_capture(output, 0))
 		return false;
@@ -152,6 +154,11 @@ void WHIPOutput::ConfigureVideoTrack(std::string media_stream_id,
 		video_description.addAV1Codec(video_payload_type);
 		packetizer = std::make_shared<rtc::AV1RtpPacketizer>(
 			rtc::AV1RtpPacketizer::Packetization::TemporalUnit,
+			rtp_config, MAX_VIDEO_FRAGMENT_SIZE);
+	} else if (is_hevc) {
+		video_description.addH265Codec(video_payload_type);
+		packetizer = std::make_shared<rtc::H265RtpPacketizer>(
+			rtc::H265RtpPacketizer::Separator::StartSequence,
 			rtp_config, MAX_VIDEO_FRAGMENT_SIZE);
 	} else {
 		video_description.addH264Codec(video_payload_type);
@@ -584,7 +591,7 @@ void register_whip_output()
 	info.get_connect_time_ms = [](void *priv_data) -> int {
 		return static_cast<WHIPOutput *>(priv_data)->GetConnectTime();
 	};
-	info.encoded_video_codecs = "h264;av1";
+	info.encoded_video_codecs = "h264;hevc;av1";
 	info.encoded_audio_codecs = "opus";
 	info.protocols = "WHIP";
 

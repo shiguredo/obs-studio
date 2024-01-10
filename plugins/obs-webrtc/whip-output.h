@@ -44,6 +44,7 @@ private:
 
 	obs_output_t *output;
 	bool is_av1;
+	bool is_hevc;
 
 	std::string endpoint_url;
 	std::string bearer_token;
