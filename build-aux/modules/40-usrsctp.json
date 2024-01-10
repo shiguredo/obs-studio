@@ -15,8 +15,7 @@
         {
             "type": "git",
             "url": "https://github.com/sctplab/usrsctp.git",
-            "tag": "0.9.5.0",
-            "commit": "07f871bda23943c43c9e74cc54f25130459de830"
+            "commit": "ebb18adac6501bad4501b1f6dccb67a1c85cc299"
         }
     ]
 }
